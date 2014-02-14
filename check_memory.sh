@@ -1,3 +1,4 @@
+#!/bin/bash
 # $Id: check_mem,v 1.3 2008/09/17 21:47:03 nagios Exp nagios $
 #
 #  Revision 1.4  2013/07/02 02:09 PM IST  nagios
