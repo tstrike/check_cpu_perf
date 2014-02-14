@@ -4,21 +4,25 @@
 #
 # Licence : GPL - http://www.fsf.org/licenses/gpl.txt
 #
-# Author        : Luke Harris
-# version       : 2011090802
+# Initial Author : Luke Harris
+# Adaptations by : Etienne Magro
+# version       : 20140214
 # Creation date : 1 October 2010
-# Revision date : 8 September 2011
+# Revision date : 14 February 2014
 # Description   : Nagios plugin to check CPU performance statistics.
 #               This script has been tested on the following Linux and Unix platforms:
 #		RHEL 4, RHEL 5, RHEL 6, CentOS 4, CentOS 5, CentOS 6, SUSE, Ubuntu, Debian, FreeBSD 7, AIX 5, AIX 6, and Solaris 8 (Solaris 9 & 10 *should* work too)
 #               The script is used to obtain key CPU performance statistics by executing the sar command, eg. user, system, iowait, steal, nice, idle
 #		The Nagios Threshold test is based on CPU idle percentage only, this is NOT CPU used.
+#               EDIT : Values have been inverted for legacy monitoring system rules integration
+#               EDIT : So if (100-CPUidle)>warning) => raises warning alert
+#               EDIT : and if (100-CPUidle)>critical) => raises critical alert
 #		Support has been added for Nagios Plugin Performance Data for integration with Splunk, NagiosGrapher, PNP4Nagios, 
 #		opcp, NagioStat, PerfParse, fifo-rrd, rrd-graph, etc
 #
 # USAGE         : ./check_cpu_perf.sh {warning} {critical}
 #
-# Example: ./check_cpu_perf.sh 20 10
+# Example: ./check_cpu_perf.sh 80 90
 # OK: CPU Idle = 84.10% | CpuUser=12.99; CpuNice=0.00; CpuSystem=2.90; CpuIowait=0.01; CpuSteal=0.00; CpuIdle=84.10:20:10
 #
 # Note: the option exists to NOT test for a threshold. Specifying 0 (zero) for both warning and critical will always return an exit code of 0.
@@ -30,7 +34,7 @@ then
  echo "Please include two arguments, eg."
  echo "Usage: $0 {warning} {critical}"
  echo "Example :-"
- echo "$0 20 10"
+ echo "$0 80 90"
 exit 3
 fi
 
@@ -44,10 +48,10 @@ if [ $1 -eq 0 ]
 fi
         
 #Ensure warning is greater than critical limit
-if [ $1 -lt $2 ]
+if [ $2 -lt $1 ]
  then
   echo "Please ensure warning is greater than critical, eg."
-  echo "Usage: $0 20 10"
+  echo "Usage: $0 80 90"
   exit 3
 fi
 
@@ -197,11 +201,11 @@ if [ "$ALERT" == "false" ]
 fi
 
 #Display CPU Performance with alert
-if [ ${SARCPUIDLE} -lt $2 ]
+if [ ${SARCPUIDLE} -lt $((100-$2)) ]
  then
 		echo "CRITICAL: $CPU"
 		exit 2
- elif [ $SARCPUIDLE -lt $1 ]
+ elif [ ${SARCPUIDLE} -lt $((100-$1)) ]
 		 then
 		  echo "WARNING: $CPU"
 		  exit 1
