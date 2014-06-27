@@ -98,18 +98,30 @@ percent=`echo "scale=2; $available/$total*100" | bc`
 #echo `echo "$percent <=  $warning"|bc`
 #echo `echo "$percent >  $warning"|bc`
  
+
+totalMB=`echo "$total/1024" | bc`
+availableMB=`echo "$available/1024" | bc`
+usedMB=`echo "$totalMB-$availableMB" | bc`
+usedpercent=`echo "100-$percent" | bc`
+
+invWarn=`echo 100-$warning | bc`
+invCrit=`echo 100-$critical | bc`
+
+perf="|RAM=$usedpercent%;$invWarn;$invCrit;"
+output="- Total=${totalMB}MB, Used=${usedMB}MB ($usedpercent%), Free=${availableMB}MB ($percent%) $perf"
+
 if [ "`echo "$percent <=  $critical"|bc`" -eq 1 ]
-    then
-        echo "CRITICAL - $available KB ($percent%) Free Memory"
+then
+        echo "RAM CRITICAL $output"
         exit 2
 fi
 if [ "`echo "$percent <=  $warning"|bc`" -eq 1 ]
-        then
-                echo "WARNING - $available KB ($percent%) Free Memory"
-                exit 1
+then
+        echo "RAM WARNING $output"
+        exit 1
 fi
 if [ "`echo "$percent >  $warning"|bc`" -eq 1 ]
-        then
-                echo "OK - $available KB ($percent%) Free Memory"
-                exit 0
+then
+        echo "RAM OK $output"
+        exit 0
 fi
