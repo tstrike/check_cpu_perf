@@ -110,6 +110,6 @@ if [ "`echo "$percent <=  $warning"|bc`" -eq 1 ]
 fi
 if [ "`echo "$percent >  $warning"|bc`" -eq 1 ]
         then
-                echo "OK - $availabe KB ($percent%) Free Memory"
+                echo "OK - $available KB ($percent%) Free Memory"
                 exit 0
 fi
