@@ -55,6 +55,10 @@ if [ $2 -lt $1 ]
   exit 3
 fi
 
+SEUIL_WARN=$((100-$1))
+SEUIL_CRIT=$((100-$2))
+
+
 #Detect which OS and if it is Linux then it will detect which Linux Distribution.
 OS=`uname -s`
  
@@ -132,10 +136,10 @@ SYSSTATRPM=`rpm -q sysstat|awk -F\- '{print $2}'|awk -F\. '{print $1}'`
 if [ $SYSSTATRPM -gt 5 ]
  then
   SARCPUIDLE=`echo ${SARCPU}|awk '{print $8}'|awk -F. '{print $1}'`
-  CPU=`echo ${SARCPU}|awk '{print "CPU Used = " 100-$8 "% | " "CpuUser=" $3 "; CpuNice=" $4 "; CpuSystem=" $5 "; CpuIowait=" $6 "; CpuSteal=" $7 "; CpuIdle=" $8":20:10"}'`
+  CPU=`echo ${SARCPU}|awk '{print "CPU Used = " 100-$8 "% | " "CpuUser=" $3 "; CpuNice=" $4 "; CpuSystem=" $5 "; CpuIowait=" $6 "; CpuSteal=" $7 "; CpuIdle=" $8";'$SEUIL_WARN';'$SEUIL_CRIT'}'`
  else
   SARCPUIDLE=`echo ${SARCPU}|awk '{print $7}'|awk -F. '{print $1}'`
-  CPU=`echo ${SARCPU}|awk '{print "CPU Used = " 100-$7 "% | " "CpuUser=" $3 "; CpuNice=" $4 "; CpuSystem=" $5 "; CpuIowait=" $6 "; CpuIdle=" $7":20:10"}'`
+  CPU=`echo ${SARCPU}|awk '{print "CPU Used = " 100-$7 "% | " "CpuUser=" $3 "; CpuNice=" $4 "; CpuSystem=" $5 "; CpuIowait=" $6 "; CpuIdle=" $7";'$SEUIL_WARN';'$SEUIL_CRIT'"}'`
 fi
 ;;
 'dpkg')
@@ -144,10 +148,10 @@ SYSSTATDPKG=`dpkg -l sysstat|grep sysstat|awk '{print $3}'|awk -F\. '{print $1}'
 if [ $SYSSTATDPKG -gt 5 ]
  then
   SARCPUIDLE=`echo ${SARCPU}|awk '{print $8}'|awk -F. '{print $1}'`
-  CPU=`echo ${SARCPU}|awk '{print "CPU Used = " 100-$8 "% | " "CpuUser=" $3 "; CpuNice=" $4 "; CpuSystem=" $5 "; CpuIowait=" $6 "; CpuSteal=" $7 "; CpuIdle=" $8":20:10"}'`
+  CPU=`echo ${SARCPU}|awk '{print "CPU Used = " 100-$8 "% | " "CpuUser=" $3 "; CpuNice=" $4 "; CpuSystem=" $5 "; CpuIowait=" $6 "; CpuSteal=" $7 "; CpuIdle=" $8";'$SEUIL_WARN';'$SEUIL_CRIT'"}'`
  else
   SARCPUIDLE=`echo ${SARCPU}|awk '{print $7}'|awk -F. '{print $1}'`
-  CPU=`echo ${SARCPU}|awk '{print "CPU Used = " 100-$7 "% | " "CpuUser=" $3 "; CpuNice=" $4 "; CpuSystem=" $5 "; CpuIowait=" $6 "; CpuIdle=" $7":20:10"}'`
+  CPU=`echo ${SARCPU}|awk '{print "CPU Used = " 100-$7 "% | " "CpuUser=" $3 "; CpuNice=" $4 "; CpuSystem=" $5 "; CpuIowait=" $6 "; CpuIdle=" $7";'$SEUIL_WARN';'$SEUIL_CRIT'"}'`
 fi
 ;;
 'lslpp')
@@ -158,7 +162,7 @@ if [ $SYSSTATLSLPP -gt 4 ]
   CpuPhysc=`echo ${SARCPU}|awk '{print $6}'`
   LPARCPU=`/usr/bin/lparstat -i | grep "Maximum Capacity" | awk '{print $4}' |head -1`
   SARCPUIDLE=`echo "scale=2;100-(${CpuPhysc}/${LPARCPU}*100)" | bc | awk -F. '{print $1}'`
-  PERFDATA=`echo ${SARCPU}|awk '{print "CpuUser=" $2 "; CpuSystem=" $3 "; CpuIowait=" $4 "; CpuPhysc=" $6 "; CpuEntc=" $7 "; CpuIdle=" $5":20:10"}'`
+  PERFDATA=`echo ${SARCPU}|awk '{print "CpuUser=" $2 "; CpuSystem=" $3 "; CpuIowait=" $4 "; CpuPhysc=" $6 "; CpuEntc=" $7 "; CpuIdle=" $5";'$SEUIL_WARN';'$SEUIL_CRIT'"}'`
   CPU=`echo "CPU Idle = "${SARCPUIDLE}"% |" ${PERFDATA}"; LparCpuIdle="${SARCPUIDLE}"; LparCpuTotal="$LPARCPU`
  else
   echo "AIX $SYSSTATLSLPP Not Supported"
@@ -171,7 +175,7 @@ SYSSTATPKGINFO=`pkginfo -l SUNWaccu|grep VERSION|awk '{print $2}'|awk -F\. '{pri
 if [ $SYSSTATPKGINFO -ge 11 ]
  then
   SARCPUIDLE=`echo ${SARCPU}|awk '{print $5}'`
-  CPU=`echo ${SARCPU}|awk '{print "CPU Used = " 100-$5 "% | " "CpuUser=" $2 "; CpuSystem=" $3 "; CpuIowait=" $4 "; CpuIdle=" $5":20:10"}'`
+  CPU=`echo ${SARCPU}|awk '{print "CPU Used = " 100-$5 "% | " "CpuUser=" $2 "; CpuSystem=" $3 "; CpuIowait=" $4 "; CpuIdle=" $5";'$SEUIL_WARN';'$SEUIL_CRIT'"}'`
  else
   echo "Solaris $SYSSTATPKGINFO Not Supported"
   exit 3
@@ -183,7 +187,7 @@ SYSSTATPKGINFO=`pkg_info | grep ^bsdsar | awk -F\- '{print $2}' | awk -F\. '{pri
 if [ $SYSSTATPKGINFO -ge 1 ]
  then
   SARCPUIDLE=`echo ${SARCPU}|awk '{print $6}'`
-  CPU=`echo ${SARCPU}|awk '{print "CPU Used = " 100-$6 "% | " "CpuUser=" $2 "; CpuSystem=" $3 "; CpuNice=" $4 "; CpuIntrpt=" $5 "; CpuIdle=" $6":20:10"}'`
+  CPU=`echo ${SARCPU}|awk '{print "CPU Used = " 100-$6 "% | " "CpuUser=" $2 "; CpuSystem=" $3 "; CpuNice=" $4 "; CpuIntrpt=" $5 "; CpuIdle=" $6";'$SEUIL_WARN';'$SEUIL_CRIT'""}'`
  else
   echo "BSD $SYSSTATPKGINFO Not Supported"
   exit 3
@@ -201,11 +205,11 @@ if [ "$ALERT" == "false" ]
 fi
 
 #Display CPU Performance with alert
-if [ ${SARCPUIDLE} -lt $((100-$2)) ]
+if [ ${SARCPUIDLE} -lt ${SEUIL_CRIT} ]
  then
 		echo "CRITICAL: $CPU"
 		exit 2
- elif [ ${SARCPUIDLE} -lt $((100-$1)) ]
+ elif [ ${SARCPUIDLE} -lt ${SEUIL_WARN} ]
 		 then
 		  echo "WARNING: $CPU"
 		  exit 1
