@@ -136,7 +136,7 @@ SYSSTATRPM=`rpm -q sysstat|awk -F\- '{print $2}'|awk -F\. '{print $1}'`
 if [ $SYSSTATRPM -gt 5 ]
  then
   SARCPUIDLE=`echo ${SARCPU}|awk '{print $8}'|awk -F. '{print $1}'`
-  CPU=`echo ${SARCPU}|awk '{print "CPU Used = " 100-$8 "% | " "CpuUser=" $3 "; CpuNice=" $4 "; CpuSystem=" $5 "; CpuIowait=" $6 "; CpuSteal=" $7 "; CpuIdle=" $8";'$SEUIL_WARN';'$SEUIL_CRIT'}'`
+  CPU=`echo ${SARCPU}|awk '{print "CPU Used = " 100-$8 "% | " "CpuUser=" $3 "; CpuNice=" $4 "; CpuSystem=" $5 "; CpuIowait=" $6 "; CpuSteal=" $7 "; CpuIdle=" $8";'$SEUIL_WARN';'$SEUIL_CRIT'"}'`
  else
   SARCPUIDLE=`echo ${SARCPU}|awk '{print $7}'|awk -F. '{print $1}'`
   CPU=`echo ${SARCPU}|awk '{print "CPU Used = " 100-$7 "% | " "CpuUser=" $3 "; CpuNice=" $4 "; CpuSystem=" $5 "; CpuIowait=" $6 "; CpuIdle=" $7";'$SEUIL_WARN';'$SEUIL_CRIT'"}'`
