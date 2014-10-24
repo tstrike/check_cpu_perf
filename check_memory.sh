@@ -38,7 +38,7 @@ then
     echo ""
     echo "Usage: $USAGE"
     echo ""
-    exit 0
+    exit 3
 fi
 # read input
 while [ $# -gt 0 ]
@@ -63,7 +63,7 @@ then
     echo ""
         echo "Usage: $USAGE"
     echo ""
-        exit 0
+        exit 3
 fi
  
 # Total physical memory
