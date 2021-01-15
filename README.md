@@ -1,4 +1,4 @@
-nagios-plugins
+check_cpu_used
 ==============
 
-Nagios-plugins developped or adapted for my personnal use, or to be used into my entreprise's monitoring system.
+check_cpu_used forked & adapted for personnal use, or to be used within my entreprise's monitoring system.
