@@ -1,14 +1,14 @@
 #!/bin/bash
 #
-# Check CPU Performance plugin for Nagios 
+# Check CPU Performance plugin for Nagios
 #
 # Licence : GPL - http://www.fsf.org/licenses/gpl.txt
 #
 # Initial Author : Luke Harris
-# Adaptations by : Etienne Magro
+# Adaptations by : tstrike, Etienne Magro
 # version       : 20140214
 # Creation date : 1 October 2010
-# Revision date : 14 February 2014
+# Revision date : 12 May 2022
 # Description   : Nagios plugin to check CPU performance statistics.
 #               This script has been tested on the following Linux and Unix platforms:
 #		RHEL 4, RHEL 5, RHEL 6, CentOS 4, CentOS 5, CentOS 6, SUSE, Ubuntu, Debian, FreeBSD 7, AIX 5, AIX 6, and Solaris 8 (Solaris 9 & 10 *should* work too)
@@ -17,7 +17,7 @@
 #               EDIT : Values have been inverted for legacy monitoring system rules integration
 #               EDIT : So if (100-CPUidle)>warning) => raises warning alert
 #               EDIT : and if (100-CPUidle)>critical) => raises critical alert
-#		Support has been added for Nagios Plugin Performance Data for integration with Splunk, NagiosGrapher, PNP4Nagios, 
+#		Support has been added for Nagios Plugin Performance Data for integration with Splunk, NagiosGrapher, PNP4Nagios,
 #		opcp, NagioStat, PerfParse, fifo-rrd, rrd-graph, etc
 #
 # USAGE         : ./check_cpu_perf.sh {warning} {critical}
@@ -46,7 +46,7 @@ if [ $1 -eq 0 ]
     ALERT=false
   fi
 fi
-        
+
 #Ensure warning is greater than critical limit
 if [ $2 -lt $1 ]
  then
@@ -61,16 +61,16 @@ SEUIL_CRIT=$((100-$2))
 
 #Detect which OS and if it is Linux then it will detect which Linux Distribution.
 OS=`uname -s`
- 
+
 GetVersionFromFile()
 {
 	VERSION=`cat $1 | tr "\n" ' ' | sed s/.*VERSION.*=\ // `
 }
- 
+
 if [ "${OS}" = "SunOS" ] ; then
 	OS=Solaris
 	DIST=Solaris
-	ARCH=`uname -p`	
+	ARCH=`uname -p`
 elif [ "${OS}" = "AIX" ] ; then
 	DIST=AIX
 elif [ "${OS}" = "FreeBSD" ] ; then
@@ -79,6 +79,8 @@ elif [ "${OS}" = "Linux" ] ; then
 	KERNEL=`uname -r`
 	if [ -f /etc/redhat-release ] ; then
 		DIST='RedHat'
+	elif [ -f /etc/system-release ] ; then
+		DIST=`cat /etc/system-release | tr "\n" ' '| sed s/\s*release.*//`
 	elif [ -f /etc/SuSE-release ] ; then
 		DIST=`cat /etc/SuSE-release | tr "\n" ' '| sed s/VERSION.*//`
 	elif [ -f /etc/mandrake-release ] ; then
@@ -91,9 +93,12 @@ elif [ "${OS}" = "Linux" ] ; then
 	fi
 fi
 
-#Define package format 
+#Define package format
 case "`echo ${DIST}|awk '{print $1}'`" in
 'RedHat')
+PACKAGE="rpm"
+;;
+'Amazon')
 PACKAGE="rpm"
 ;;
 'SUSE')
@@ -217,4 +222,3 @@ if [ ${SARCPUIDLE} -lt ${SEUIL_CRIT} ]
 		  echo "OK: $CPU"
 		  exit 0
 fi
-
